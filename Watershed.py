@@ -2,40 +2,16 @@ import arcpy
 import os
 from arcpy.sa import *
 arcpy.env.overwriteOutput = True
-data_path = r'' # Define Path here
+data = r'' # Define Path here
 out_path = r'' # Define GDB path here
 arcpy.env.workspace = data_path
 #Setting Environment and Data Modification
 
-wkt = """PROJCS["NAD_1983_2011_StatePlane_North_Carolina_FIPS_3200",
-         GEOGCS["GCS_NAD_1983_2011",DATUM["D_NAD_1983_2011",
-         SPHEROID["GRS_1980",6378137.0,298.257222101]],
-         PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],
-         PROJECTION["Lambert_Conformal_Conic"],
-         PARAMETER["False_Easting",609601.2192024384],
-         PARAMETER["False_Northing",0.0],
-         PARAMETER["Central_Meridian",-79.0],
-         PARAMETER["Standard_Parallel_1",34.33333333333334],
-         PARAMETER["Standard_Parallel_2",36.16666666666666],
-         PARAMETER["Latitude_Of_Origin",33.75],
-         UNIT["Meter",1.0]]"""
-
-arcpy.management.ProjectRaster( "buncombe-DEM03.tif", "E:/Courses/Fall 2024/GEOG 6460/Week 9/buncombe-DEM03/Week 9/Week 9.gdb/Prj_raster",
-                               wkt, "BILINEAR", "1", "#", "#", "#", "#")
-
 out_path = r'E:\Courses\Fall 2024\GEOG 6460\Week 9\buncombe-DEM03\Week 9\Week 9.gdb'
-arcpy.env.workspace = out_path
-
-prj_raster = arcpy.Raster("Prj_raster")
-raster_meter2 = prj_raster * 0.3048
-raster_meter2.save(r"raster_meter2")
-
-outFill = Fill("raster_meter2")
-outFill.save(r"raster_meter_f")
 
 #Hydrological Analysis
 
-outFlowDirection = arcpy.sa.FlowDirection("raster_meter_f", "NORMAL","test_flow_Dir","D8")
+outFlowDirection = arcpy.sa.FlowDirection(data, "NORMAL","test_flow_Dir","D8")
 outFlowDirection.save("flow_dir")
 
 Print("Flow Direction Done !")
@@ -96,4 +72,4 @@ arcpy.MakeFeatureLayer_management("Watershed_Poly", "Watershed_Poly_layer")
 arcpy.management.SelectLayerByAttribute("Watershed_Poly_layer", "NEW_SELECTION", "Shape_Area < 1051")
 arcpy.Eliminate_management("Watershed_Poly_layer", "Final_Watershed_Poly","AREA")
 
-Print("Watershed editing Creation and Silver Polygon removing Done !")
+Print("Watershed editing and Silver Polygon removing Done !")
